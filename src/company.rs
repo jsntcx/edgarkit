@@ -13,6 +13,7 @@ use super::CompanyOperations;
 use super::Edgar;
 use super::error::{EdgarError, Result};
 use async_trait::async_trait;
+use serde::de::{self, Deserializer};
 use serde::{Deserialize, Serialize};
 use serde_json;
 use std::collections::HashMap;
@@ -67,8 +68,25 @@ pub struct CompanyTickerExchange {
 /// Use this structure when you need comprehensive historical data for a company across
 /// multiple concepts and time periods. For a single concept, consider using `CompanyConcept`
 /// which is more focused and lightweight.
+fn cik_str_or_u64<'de, D: Deserializer<'de>>(d: D) -> std::result::Result<u64, D::Error> {
+    #[derive(Deserialize)]
+    #[serde(untagged)]
+    enum StrOrU64 {
+        Str(String),
+        U64(u64),
+    }
+    match StrOrU64::deserialize(d)? {
+        StrOrU64::U64(n) => Ok(n),
+        StrOrU64::Str(s) => s
+            .trim_start_matches('0')
+            .parse::<u64>()
+            .map_err(de::Error::custom),
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CompanyFacts {
+    #[serde(deserialize_with = "cik_str_or_u64")]
     pub cik: u64,
     #[serde(rename = "entityName")]
     pub entity_name: String,
