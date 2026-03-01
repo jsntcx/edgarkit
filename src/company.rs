@@ -103,6 +103,7 @@ pub struct CompanyFacts {
 pub struct TaxonomyGroups {
     #[serde(rename = "us-gaap")]
     pub us_gaap: HashMap<String, Fact>,
+    #[serde(default)]
     pub dei: HashMap<String, Fact>,
 }
 
