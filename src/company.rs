@@ -101,7 +101,7 @@ pub struct CompanyFacts {
 /// while DEI (Document and Entity Information) contains metadata about the company and filing.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TaxonomyGroups {
-    #[serde(rename = "us-gaap")]
+    #[serde(default, rename = "us-gaap")]
     pub us_gaap: HashMap<String, Fact>,
     #[serde(default)]
     pub dei: HashMap<String, Fact>,
